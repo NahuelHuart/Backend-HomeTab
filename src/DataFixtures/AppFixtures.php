@@ -18,9 +18,22 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Crear una llar
-        $household = new Household();
-        $household->setName('Pis Compartit Barcelona');
-        $manager->persist($household);
+        $householdNames = [
+            'Casa Home',
+            'Pis Compartit Girona',
+            'Casa a Puigcerdà',
+            'Club de Lectura'
+        ];
+
+        $households = [];
+
+        foreach ($householdNames as $name) {
+            $household = new Household();
+            $household->setName($name);
+            $manager->persist($household);
+
+            $households[] = $household;
+        }
 
         // Crear un administrador
         $admin = new User();
@@ -48,7 +61,9 @@ class AppFixtures extends Fixture
             'Netejar la cuina',
             'Passar l\'aspiradora',
             'Rentar els plats',
-            'Comprar pa'
+            'Comprar pa',
+            'Treure el gos',
+            'Donar de menjar al gat'
         ];
 
         foreach ($tasques as $titol) {
