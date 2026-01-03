@@ -23,6 +23,7 @@
         "symfony/yaml": "7.4.*"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "symfony/form": "*",
         "symfony/maker-bundle": "*",
         "symfony/twig-bundle": "*"
