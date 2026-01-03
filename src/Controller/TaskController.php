@@ -10,22 +10,55 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 
 #[Route('/task')]
+#[IsGranted('ROLE_USER')] // Només els usuaris logejats podràn accedir a aquest controlador!
 final class TaskController extends AbstractController
 {
-    #[Route(name: 'app_task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
-    {
-        return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
-        ]);
-    }
+   #[Route('/', name: 'app_task_index', methods: ['GET'])]
+public function index(TaskRepository $taskRepository): Response
+{
+    // Obtenir l'usuari actual
+    /** @var \App\Entity\User $user */
+    $user = $this->getUser();
+    if (!$user instanceof \App\Entity\User) {
+        throw $this->createAccessDeniedException(); //retorna null si algú accedeix sense login
+}
+    
+    // Només mostrar tasques de la seva llar
+    $tasks = $taskRepository->findBy([
+        'household' => $user->getHousehold()
+    ]);
+
+    return $this->render('task/index.html.twig', [
+        'tasks' => $tasks,
+    ]);
+}
 
     #[Route('/new', name: 'app_task_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $task = new Task();
+
+        // Assignar automàticament la llar i usuari actual
+        /** 
+         * L'usuari no ha de triar manualment la llar (ja sabem quina és!)
+         * La tasca s'assigna automàticament a l'usuari que la crea
+         * Evita que algú pugui falsificar aquestes dades
+         * 
+         * **/
+
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+    
+        $task->setHousehold($user->getHousehold());
+        $task->setAssignedTo($user);
+        $task->setCreatedAt(new \DateTime());
+        $task->setCompleted(false);
+
+
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
