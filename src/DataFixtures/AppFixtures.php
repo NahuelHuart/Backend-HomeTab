@@ -20,7 +20,7 @@ class AppFixtures extends Fixture
         // Crear una llar
         $householdNames = [
             'Casa Home',
-            'Pis Compartit Girona',
+            'Pis Compartit a Girona',
             'Casa a Puigcerdà',
             'Club de Lectura'
         ];
