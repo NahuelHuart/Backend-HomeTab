@@ -24,6 +24,8 @@ class AdminController extends AbstractController
         EventRepository $eventRepository,
         ExpenseRepository $expenseRepository
     ): Response {
+        
+        /** @var \App\Entity\User $user */
         $household = $this->getUser()->getHousehold();
 
         $stats = [
