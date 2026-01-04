@@ -174,7 +174,7 @@ class Expense
         return $this->paidAt;
     }
 
-    public function setPaidAt(\DateTimeImmutable $paidAt): static
+    public function setPaidAt(\DateTime $paidAt): static
     {
         $this->paidAt = $paidAt;
 

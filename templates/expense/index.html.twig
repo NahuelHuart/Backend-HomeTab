@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Expense index{% endblock %}
+
+{% block body %}
+    <h1>Expense index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>PaidAt</th>
+                <th>IsPaid</th>
+                <th>Notes</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.id }}</td>
+                <td>{{ expense.title }}</td>
+                <td>{{ expense.description }}</td>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.category }}</td>
+                <td>{{ expense.paidAt ? expense.paidAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ expense.isPaid ? 'Yes' : 'No' }}</td>
+                <td>{{ expense.notes }}</td>
+                <td>
+                    <a href="{{ path('app_expense_show', {'id': expense.id}) }}">show</a>
+                    <a href="{{ path('app_expense_edit', {'id': expense.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_expense_new') }}">Create new</a>
+{% endblock %}
