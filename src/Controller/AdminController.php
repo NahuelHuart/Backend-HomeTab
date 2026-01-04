@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Controller;
-
 use App\Repository\UserRepository;
 use App\Repository\HouseholdRepository;
 use App\Repository\TaskRepository;
@@ -24,9 +23,10 @@ class AdminController extends AbstractController
         EventRepository $eventRepository,
         ExpenseRepository $expenseRepository
     ): Response {
-        
+
         /** @var \App\Entity\User $user */
-        $household = $this->getUser()->getHousehold();
+        $user = $this->getUser();
+        $household = $user->getHousehold();
 
         $stats = [
             'totalUsers' => count($household->getUsers()),
