@@ -2,7 +2,12 @@
 
 namespace App\Entity;
 
+
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Repository\UserRepository;
+use App\Entity\Expense;
+use App\Entity\Event;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -12,6 +17,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'Ja existeix un usuari amb aquest email')]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -20,6 +27,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message: 'L\'email no pot estar buit')]
+    #[Assert\Email(message: 'L\'email {{ value }} no és vàlid')]
     private ?string $email = null;
 
     /**
@@ -56,32 +65,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Expense::class, mappedBy: 'splitBetween')]
     private Collection $sharedExpenses;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'El nom no pot estar buit')]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: 'El nom ha de tenir almenys {{ limit }} caràcters'
+    )]
     private ?string $firstName = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'El cognom no pot estar buit')]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: 'El cognom ha de tenir almenys {{ limit }} caràcters'
+    )]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^[+]?[0-9\s\-()]+$/',
+        message: 'El número de telèfon no és vàlid'
+    )]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url(message: 'L\'URL de l\'avatar no és vàlida')]
     private ?string $avatar = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 500,
+        maxMessage: 'La biografia no pot superar els {{ limit }} caràcters'
+    )]
     private ?string $bio = null;
 
-    #[ORM\Column]
-    private ?\DateTime $joinedAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $joinedAt = null;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private ?bool $isActive = true;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->expensesPaid = new ArrayCollection();
         $this->sharedExpenses = new ArrayCollection();
+    }
+
+    /**
+     * Retorna el nom complet
+     */
+    public function getFullName(): string
+    {
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     public function getId(): ?int
@@ -155,7 +193,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
-        
+
         return $data;
     }
 

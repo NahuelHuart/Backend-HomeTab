@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ExpenseRepository::class)]
 class Expense
@@ -16,24 +17,54 @@ class Expense
     #[ORM\Column]
     private ?int $id = null;
 
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'El títol de la despesa no pot estar buit')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'El títol ha de tenir almenys {{ limit }} caràcters'
+    )]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'La descripció no pot estar buida')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'La descripció ha de tenir almenys {{ limit }} caràcters'
+    )]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull(message: 'L\'import és obligatori')]
+    #[Assert\Positive(message: 'L\'import ha de ser positiu')]
+    #[Assert\Range(
+        min: 0.01,
+        max: 99999.99,
+        notInRangeMessage: 'L\'import ha d\'estar entre {{ min }}€ i {{ max }}€'
+    )]
     private ?string $amount = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Choice(
+        choices: ['Lloger', 'Factures', 'Menjar', 'Neteja', 'Transport', 'Altres'],
+        message: 'Tria una categoria vàlida'
+    )]
     private ?string $category = null;
 
     #[ORM\ManyToOne(inversedBy: 'expensesPaid')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $paidBy = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $paidAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: 'La data de pagament és obligatòria')]
+    #[Assert\LessThanOrEqual(
+        'today',
+        message: 'La data de pagament no pot ser futura'
+    )]
+    private ?\DateTimeInterface $paidAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'expenses')]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,10 +74,14 @@ class Expense
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sharedExpenses')]
+    #[Assert\Count(
+        min: 1,
+        minMessage: 'Has de seleccionar almenys un participant'
+    )]
     private Collection $splitBetween;
 
     #[ORM\Column]
-    private ?bool $isPaid = null;
+    private ?bool $isPaid = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
@@ -54,6 +89,19 @@ class Expense
     public function __construct()
     {
         $this->splitBetween = new ArrayCollection();
+        $this->isPaid = false;
+    }
+
+    /**
+     * Calcula quant ha de pagar cada persona
+     */
+    public function getAmountPerPerson(): float
+    {
+        $totalPeople = $this->splitBetween->count();
+        if ($totalPeople === 0) {
+            return 0;
+        }
+        return (float)$this->amount / $totalPeople;
     }
 
     public function getId(): ?int

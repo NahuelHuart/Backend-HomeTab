@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Entity;
 
 use App\Repository\EventRepository;
@@ -7,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -17,24 +19,44 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'El títol no pot estar buit')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'El títol ha de tenir almenys {{ limit }} caràcters',
+        maxMessage: 'El títol no pot superar els {{ limit }} caràcters'
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: 'La descripció no pot superar els {{ limit }} caràcters'
+    )]
     private ?string $description = null;
 
-    #[ORM\Column]
-    private ?\DateTime $startDate = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: 'La data d\'inici és obligatòria')]
+    private ?\DateTimeInterface $startDate = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $endDate = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Assert\GreaterThan(
+        propertyPath: 'startDate',
+        message: 'La data de finalització ha de ser posterior a la d\'inici'
+    )]
+    private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
 
     #[ORM\Column]
-    private ?bool $isAllDay = null;
+    private ?bool $isAllDay = false;
 
     #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^#[0-9A-Fa-f]{6}$/',
+        message: 'El color ha de ser un codi hexadecimal vàlid (ex: #FF5733)'
+    )]
     private ?string $color = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -54,6 +76,7 @@ class Event
     public function __construct()
     {
         $this->participants = new ArrayCollection();
+        $this->isAllDay = false;
     }
 
     public function getId(): ?int

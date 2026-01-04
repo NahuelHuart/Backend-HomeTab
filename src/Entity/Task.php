@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\TaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,6 +21,16 @@ class Task
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $dueDate = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Choice(choices: ['Baixa', 'Mitja', 'Alta'], message: 'La prioritat ha de ser Baixa, Mitja o Alta')]
+    private ?string $priority = 'Mitja';
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $category = null;
+
     #[ORM\Column]
     private ?bool $completed = null;
 
@@ -33,6 +44,8 @@ class Task
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $assignedTo = null;
+
+
 
     public function getId(): ?int
     {
@@ -108,6 +121,36 @@ class Task
     {
         $this->assignedTo = $assignedTo;
 
+        return $this;
+    }
+
+    public function getDueDate(): ?\DateTime
+    {
+        return $this->dueDate;
+    }
+    public function setDueDate(?\DateTime $dueDate): static
+    {
+        $this->dueDate = $dueDate;
+        return $this;
+    }
+
+    public function getPriority(): ?string
+    {
+        return $this->priority;
+    }
+    public function setPriority(?string $priority): static
+    {
+        $this->priority = $priority;
+        return $this;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+    public function setCategory(?string $category): static
+    {
+        $this->category = $category;
         return $this;
     }
 }
