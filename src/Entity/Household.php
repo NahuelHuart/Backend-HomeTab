@@ -30,10 +30,17 @@ class Household
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'household')]
     private Collection $events;
 
+    /**
+     * @var Collection<int, Expense>
+     */
+    #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'household')]
+    private Collection $expenses;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->expenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -107,6 +114,36 @@ class Household
             // set the owning side to null (unless already changed)
             if ($event->getHousehold() === $this) {
                 $event->setHousehold(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Expense>
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(Expense $expense): static
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses->add($expense);
+            $expense->setHousehold($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(Expense $expense): static
+    {
+        if ($this->expenses->removeElement($expense)) {
+            // set the owning side to null (unless already changed)
+            if ($expense->getHousehold() === $this) {
+                $expense->setHousehold(null);
             }
         }
 

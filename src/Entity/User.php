@@ -43,9 +43,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'participants')]
     private Collection $events;
 
+    /**
+     * @var Collection<int, Expense>
+     */
+    #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'paidBy')]
+    private Collection $expensesPaid;
+
+    /**
+     * @var Collection<int, Expense>
+     */
+    #[ORM\ManyToMany(targetEntity: Expense::class, mappedBy: 'splitBetween')]
+    private Collection $sharedExpenses;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->expensesPaid = new ArrayCollection();
+        $this->sharedExpenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +177,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->events->removeElement($event)) {
             $event->removeParticipant($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Expense>
+     */
+    public function getExpensesPaid(): Collection
+    {
+        return $this->expensesPaid;
+    }
+
+    public function addExpensesPaid(Expense $expensesPaid): static
+    {
+        if (!$this->expensesPaid->contains($expensesPaid)) {
+            $this->expensesPaid->add($expensesPaid);
+            $expensesPaid->setPaidBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpensesPaid(Expense $expensesPaid): static
+    {
+        if ($this->expensesPaid->removeElement($expensesPaid)) {
+            // set the owning side to null (unless already changed)
+            if ($expensesPaid->getPaidBy() === $this) {
+                $expensesPaid->setPaidBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Expense>
+     */
+    public function getSharedExpenses(): Collection
+    {
+        return $this->sharedExpenses;
+    }
+
+    public function addSharedExpense(Expense $sharedExpense): static
+    {
+        if (!$this->sharedExpenses->contains($sharedExpense)) {
+            $this->sharedExpenses->add($sharedExpense);
+            $sharedExpense->addSplitBetween($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedExpense(Expense $sharedExpense): static
+    {
+        if ($this->sharedExpenses->removeElement($sharedExpense)) {
+            $sharedExpense->removeSplitBetween($this);
         }
 
         return $this;
