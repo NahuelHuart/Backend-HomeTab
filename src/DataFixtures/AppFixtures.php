@@ -49,7 +49,7 @@ class AppFixtures extends Fixture
         $admin->setPhoneNumber('+34 666 777 888');
         $admin->setBio('Administradora del pis');
         $admin->setHousehold($mainHousehold);
-        $admin->setJoinedAt(new \DateTime('-6 months'));
+        $admin->setJoinedAt((new \DateTime())->modify('-6 months'));
         $admin->setIsActive(true);
         $admin->setPassword(
             $this->passwordHasher->hashPassword($admin, 'admin123')
@@ -64,7 +64,7 @@ class AppFixtures extends Fixture
         $user1->setPhoneNumber('+34 677 888 999');
         $user1->setBio('Estudiant d\'enginyeria');
         $user1->setHousehold($mainHousehold);
-        $user1->setJoinedAt(new \DateTime('-3 months'));
+        $user1->setJoinedAt((new \DateTime())->modify('-3 months'));
         $user1->setIsActive(true);
         $user1->setPassword(
             $this->passwordHasher->hashPassword($user1, 'user123')
@@ -79,7 +79,7 @@ class AppFixtures extends Fixture
         $user2->setPhoneNumber('+34 688 999 000');
         $user2->setBio('Dissenyadora gràfica');
         $user2->setHousehold($mainHousehold);
-        $user2->setJoinedAt(new \DateTime('-4 months'));
+        $user2->setJoinedAt((new \DateTime())->modify('-4 months'));
         $user2->setIsActive(true);
         $user2->setPassword(
             $this->passwordHasher->hashPassword($user2, 'anna123')
@@ -144,6 +144,7 @@ class AppFixtures extends Fixture
 
         // 5️⃣ Crear expenses
         $expense1 = new Expense();
+        $expense1->setTitle('Lloger');
         $expense1->setDescription('Lloger de gener');
         $expense1->setAmount('900.00');
         $expense1->setCategory('Lloger');
@@ -158,6 +159,7 @@ class AppFixtures extends Fixture
         $manager->persist($expense1);
 
         $expense2 = new Expense();
+        $expense2->setTitle('Factura');
         $expense2->setDescription('Factura de la llum');
         $expense2->setAmount('75.50');
         $expense2->setCategory('Factures');
@@ -171,6 +173,7 @@ class AppFixtures extends Fixture
         $manager->persist($expense2);
 
         $expense3 = new Expense();
+        $expense3->setTitle('Compra super');
         $expense3->setDescription('Compra del supermercat');
         $expense3->setAmount('125.75');
         $expense3->setCategory('Menjar');
