@@ -1,0 +1,15 @@
+HomeTab és una aplicació web feta amb Symfony que serveix per organitzar pisos compartits, ajudant a portar les tasques, els esdeveniments i les despeses de manera centralitzada. L’aplicació funciona amb diferents tipus d’usuari: els usuaris normals només poden veure i gestionar la informació de la seva pròpia llar, mentre que els administradors poden crear i gestionar altres usuaris i veure informació global del sistema.
+
+Per posar el projecte en marxa al teu ordinador cal tenir instal·lat PHP 8.1 o superior, Composer i MySQL. Si tens un paquet com XAMPP, és una manera senzilla de tenir tot el necessari en funcionament. També cal connexió a internet perquè l’aplicació carregui els estils de Bootstrap.
+
+Un cop descarregat i descomprimit el projecte, cal obrir un terminal dins de la carpeta principal i executar composer install per instal·lar tot el que necessita l’aplicació. Després cal configurar la connexió amb la base de dades al fitxer .env. Allà s’ha d’indicar el nom de l’usuari de MySQL, la contrasenya si n’hi ha i el nom de la base de dades. Per exemple: DATABASE_URL="mysql://root:@127.0.0.1:3306/db_hometab?serverVersion=8.0.32&charset=utf8mb4".
+
+Un cop configurat això, cal crear la base de dades i carregar les dades de prova amb les comandes php bin/console doctrine:database:create, php bin/console doctrine:migrations:migrate i php bin/console doctrine:fixtures:load. Les fixtures són dades de prova que omplen automàticament la base de dades amb usuaris, llars, tasques, esdeveniments i despeses, de manera que es pot començar a provar l’aplicació sense haver de crear res a mà. Aquesta operació elimina qualsevol dada anterior, així que cal tenir-ho present.
+
+Per arrencar el projecte cal executar php -S localhost:8000 -t public i després obrir el navegador a http://localhost:8000. Per provar l’aplicació es poden utilitzar els usuaris de prova: administrador amb admin@test.com i contrasenya admin123, usuari amb user@test.com i contrasenya user123 i usuària amb anna@test.com i contrasenya anna123.
+
+Tots els usuaris poden crear i gestionar tasques, assignar-les a membres, establir prioritats i dates límit, així com marcar-les com a completades. També poden crear esdeveniments compartits i gestionar despeses, que es reparteixen automàticament entre els participants. Els administradors poden, a més, crear i gestionar altres usuaris i consultar estadístiques globals.
+
+Si en algun moment cal reiniciar la base de dades o tornar a carregar les dades de prova, es pot fer amb php bin/console doctrine:database:drop --force i després repetir la creació, les migracions i la càrrega de fixtures. Si hi ha problemes de connexió, cal comprovar que MySQL estigui en marxa. Si els estils no es veuen correctament, cal refrescar el navegador. El fitxer .env conté configuració local i no s’hauria de compartir públicament.
+
+HomeTab està feta amb Symfony 7, PHP, MySQL, Doctrine ORM, Twig i Bootstrap 5, amb una estructura clara que facilita entendre com funciona i com fer-hi modificacions si cal.

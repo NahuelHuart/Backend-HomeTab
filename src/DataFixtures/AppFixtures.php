@@ -39,16 +39,19 @@ class AppFixtures extends Fixture
 
         // Per exemple, agafem la primera household per assignar els usuaris i tasques
         $mainHousehold = $households[0];
+        $sharedHousehold = $households[1];
+        $holidayHousehold = $households[2];
+        $readingHousehold = $households[3];
 
-        // 2️⃣ Crear usuaris
+        // Crear usuaris
         $admin = new User();
         $admin->setEmail('admin@test.com');
         $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setFirstName('Maria');
+        $admin->setFirstName('Sergi');
         $admin->setLastName('García');
         $admin->setPhoneNumber('+34 666 777 888');
-        $admin->setBio('Administradora del pis');
-        $admin->setHousehold($mainHousehold);
+        $admin->setBio('Administrador del sistema');
+        $admin->setHousehold(null);
         $admin->setJoinedAt((new \DateTime())->modify('-6 months'));
         $admin->setIsActive(true);
         $admin->setPassword(
@@ -86,7 +89,7 @@ class AppFixtures extends Fixture
         );
         $manager->persist($user2);
 
-        // 3️⃣ Crear tasques
+        // Crear tasques
         $tasques = [
             ['Treure la brossa', 'Cuina', 'Mitja'],
             ['Netejar la cuina', 'Cuina', 'Alta'],
@@ -100,7 +103,7 @@ class AppFixtures extends Fixture
         foreach ($tasques as [$titol, $categoria, $prioritat]) {
             $task = new Task();
             $task->setTitle($titol);
-            $task->setDescription('Descripció de: ' . $titol);
+            $task->setDescription('Aquesta tasca consisteix en: ' . $titol);
             $task->setCompleted(false);
             $task->setCreatedAt(new \DateTime());
             $task->setDueDate(new \DateTime('+3 days'));
@@ -111,7 +114,7 @@ class AppFixtures extends Fixture
             $manager->persist($task);
         }
 
-        // 4️⃣ Crear events
+        // Crear events
         $event1 = new Event();
         $event1->setTitle('Sopar de pis');
         $event1->setDescription('Sopar mensual per parlar de temes de la llar');
@@ -142,7 +145,7 @@ class AppFixtures extends Fixture
         $event2->addParticipant($user2);
         $manager->persist($event2);
 
-        // 5️⃣ Crear expenses
+        // Crear expenses
         $expense1 = new Expense();
         $expense1->setTitle('Lloger');
         $expense1->setDescription('Lloger de gener');
@@ -186,7 +189,7 @@ class AppFixtures extends Fixture
         $expense3->setIsPaid(false);
         $manager->persist($expense3);
 
-        // 6️⃣ Guardar tot
+        // Guardar tot
         $manager->flush();
     }
 }

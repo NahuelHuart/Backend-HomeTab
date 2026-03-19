@@ -169,12 +169,12 @@ class Expense
         return $this;
     }
 
-    public function getPaidAt(): ?\DateTimeImmutable
+    public function getPaidAt(): ?\DateTimeInterface
     {
         return $this->paidAt;
     }
 
-    public function setPaidAt(\DateTime $paidAt): static
+    public function setPaidAt(\DateTimeInterface $paidAt): static
     {
         $this->paidAt = $paidAt;
 

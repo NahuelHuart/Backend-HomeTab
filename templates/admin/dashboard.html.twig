@@ -1,0 +1,307 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard - HomeTab{% endblock %}
+
+{% block body %}
+<div class="mb-4">
+    <h1 class="display-6">
+        <i class="bi bi-gear-fill text-primary"></i> 
+        Panell d'Administració
+    </h1>
+    <p class="lead text-muted">Gestiona la teva llar: {{ household.name }}</p>
+</div>
+
+{# Estadístiques globals #}
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-3 mb-1">{{ stats.totalUsers }}</h2>
+                <p class="mb-0">Membres de la llar</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-3 mb-1">{{ stats.completedTasks }} / {{ stats.totalTasks }}</h2>
+                <p class="mb-0">Tasques completades</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cash" style="font-size: 2.5rem;"></i>
+                <h2 class="mt-3 mb-1">{{ stats.unpaidExpenses }}</h2>
+                <p class="mb-0">Despeses pendents</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Estadístiques addicionals #}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-event text-primary" style="font-size: 2rem;"></i>
+                <h3 class="mt-3 mb-1">{{ stats.totalEvents }}</h3>
+                <p class="text-muted mb-0">Esdeveniments</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-list-check text-success" style="font-size: 2rem;"></i>
+                <h3 class="mt-3 mb-1">{{ stats.totalTasks }}</h3>
+                <p class="text-muted mb-0">Total Tasques</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-danger h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-hourglass-split text-danger" style="font-size: 2rem;"></i>
+                <h3 class="mt-3 mb-1">{{ stats.totalTasks - stats.completedTasks }}</h3>
+                <p class="text-muted mb-0">Tasques Pendents</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-coin text-warning" style="font-size: 2rem;"></i>
+                <h3 class="mt-3 mb-1">{{ stats.totalExpenses }}</h3>
+                <p class="text-muted mb-0">Total Despeses</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Gestió Ràpida #}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-lightning-charge-fill text-warning"></i> Gestió Ràpida
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <a href="{{ path('app_admin_users') }}" class="btn btn-outline-primary w-100 py-3">
+                    <i class="bi bi-people fs-4 d-block mb-2"></i>
+                    <strong>Gestionar Usuaris</strong>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ path('app_task_index') }}" class="btn btn-outline-success w-100 py-3">
+                    <i class="bi bi-list-check fs-4 d-block mb-2"></i>
+                    <strong>Gestionar Tasques</strong>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ path('app_event_index') }}" class="btn btn-outline-info w-100 py-3">
+                    <i class="bi bi-calendar-event fs-4 d-block mb-2"></i>
+                    <strong>Gestionar Esdeveniments</strong>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ path('app_expense_index') }}" class="btn btn-outline-warning w-100 py-3">
+                    <i class="bi bi-cash-coin fs-4 d-block mb-2"></i>
+                    <strong>Gestionar Despeses</strong>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Llista de membres #}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-people"></i> Membres de la Llar
+        </h5>
+        <a href="{{ path('app_admin_users') }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Afegir Membre
+        </a>
+    </div>
+    <div class="card-body">
+        {% if users is empty %}
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-people" style="font-size: 3rem; opacity: 0.3;"></i>
+                <p class="mt-3">No hi ha membres a la llar</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Membre</th>
+                            <th>Email</th>
+                            <th>Telèfon</th>
+                            <th>Data d'entrada</th>
+                            <th>Rol</th>
+                            <th>Estat</th>
+                            <th class="text-end">Accions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 40px; height: 40px; font-size: 0.9rem;">
+                                        <strong>{{ user.firstName|slice(0, 1)|upper }}{{ user.lastName|slice(0, 1)|upper }}</strong>
+                                    </div>
+                                    <div>
+                                        <strong>{{ user.fullName }}</strong>
+                                        {% if user.bio %}
+                                            <br><small class="text-muted">{{ user.bio|slice(0, 40) }}...</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <small>{{ user.email }}</small>
+                            </td>
+                            <td>
+                                {% if user.phoneNumber %}
+                                    <small><i class="bi bi-telephone"></i> {{ user.phoneNumber }}</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ user.joinedAt|date('d/m/Y') }}</small>
+                            </td>
+                            <td>
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-shield-fill"></i> Admin
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-person"></i> User
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.isActive %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Actiu
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle"></i> Inactiu
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ path('app_admin_users') }}" class="btn btn-outline-primary btn-sm">
+                    Veure tots els usuaris <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Informació de la llar #}
+<div class="row g-4 mt-3">
+    <div class="col-md-6">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="bi bi-house-fill"></i> Informació de la Llar</h6>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">{{ household.name }}</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-people-fill text-primary"></i>
+                        <strong>Membres:</strong> {{ stats.totalUsers }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-calendar-check text-success"></i>
+                        <strong>Esdeveniments:</strong> {{ stats.totalEvents }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-list-task text-info"></i>
+                        <strong>Tasques:</strong> {{ stats.totalTasks }}
+                    </li>
+                    <li>
+                        <i class="bi bi-cash-stack text-warning"></i>
+                        <strong>Despeses:</strong> {{ stats.totalExpenses }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-graph-up"></i> Activitat Recent</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Tasques completades</small>
+                        <small class="text-muted">
+                            {{ stats.completedTasks }}/{{ stats.totalTasks }}
+                        </small>
+                    </div>
+                    <div class="progress" style="height: 20px;">
+                        {% set percentage = stats.totalTasks > 0 ? (stats.completedTasks / stats.totalTasks * 100)|round : 0 %}
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: {{ percentage }}%"
+                             aria-valuenow="{{ percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ percentage }}%
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">
+                        <i class="bi bi-exclamation-circle text-danger"></i> Despeses pendents
+                    </span>
+                    <span class="badge bg-danger">{{ stats.unpaidExpenses }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">
+                        <i class="bi bi-check-circle text-success"></i> Despeses pagades
+                    </span>
+                    <span class="badge bg-success">{{ stats.totalExpenses - stats.unpaidExpenses }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

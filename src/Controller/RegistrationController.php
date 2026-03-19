@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Household;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,9 +19,13 @@ class RegistrationController extends AbstractController
         UserPasswordHasherInterface $userPasswordHasher, 
         EntityManagerInterface $entityManager
     ): Response {
-        // Si l'usuari ja està loguejat, redirigir
+        // Si l'usuari ja està loguejat, redirigir al dashboard corresponent
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_home');
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('app_admin_dashboard');
+            }
+
+            return $this->redirectToRoute('app_user_dashboard'); // <-- usuari normal
         }
 
         $user = new User();
@@ -48,11 +51,12 @@ class RegistrationController extends AbstractController
 
             $this->addFlash('success', 'Registre completat! Ja pots iniciar sessió.');
 
+            // Redirigir a la pàgina de login després del registre
             return $this->redirectToRoute('app_login');
         }
 
         return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form,
+            'registrationForm' => $form->createView(),
         ]);
     }
 }

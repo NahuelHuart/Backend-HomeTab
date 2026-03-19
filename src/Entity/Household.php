@@ -25,6 +25,12 @@ class Household
     private Collection $users;
 
     /**
+     * @var Collection<int, Task>
+     */
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'household')]
+    private Collection $tasks;
+
+    /**
      * @var Collection<int, Event>
      */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'household')]
@@ -39,6 +45,7 @@ class Household
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->expenses = new ArrayCollection();
     }
@@ -56,7 +63,6 @@ class Household
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -81,9 +87,37 @@ class Household
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
             if ($user->getHousehold() === $this) {
                 $user->setHousehold(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setHousehold($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            if ($task->getHousehold() === $this) {
+                $task->setHousehold(null);
             }
         }
 
@@ -111,7 +145,6 @@ class Household
     public function removeEvent(Event $event): static
     {
         if ($this->events->removeElement($event)) {
-            // set the owning side to null (unless already changed)
             if ($event->getHousehold() === $this) {
                 $event->setHousehold(null);
             }
@@ -141,7 +174,6 @@ class Household
     public function removeExpense(Expense $expense): static
     {
         if ($this->expenses->removeElement($expense)) {
-            // set the owning side to null (unless already changed)
             if ($expense->getHousehold() === $this) {
                 $expense->setHousehold(null);
             }

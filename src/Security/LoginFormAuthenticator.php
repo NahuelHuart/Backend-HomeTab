@@ -22,35 +22,48 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
-    }
+    public function __construct(private UrlGeneratorInterface $urlGenerator) {}
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->getPayload()->getString('email');
+        // Agafem els valors correctes del form POST
+        $email = $request->request->get('_username', '');
+        $password = $request->request->get('_password', '');
+        $csrfToken = $request->request->get('_csrf_token', '');
 
+        // Guardem l'email a la sessió per recordar-lo en cas de fallida
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($request->getPayload()->getString('password')),
+            new PasswordCredentials($password),
             [
-                new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
+                new CsrfTokenBadge('authenticate', $csrfToken),
                 new RememberMeBadge(),
             ]
         );
     }
 
+
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
+       // Redirect to previous page if Symfony knows a target path
+    if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+        return new RedirectResponse($targetPath);
+    }
 
-        // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+    // Get the authenticated user
+    $user = $token->getUser();
+
+    // Redirect according to roles
+    if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        // Admins go to admin dashboard
+        return new RedirectResponse($this->urlGenerator->generate('app_admin_dashboard'));
+    }
+
+    // Regular users go to user dashboard
+    return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
     }
 
     protected function getLoginUrl(Request $request): string

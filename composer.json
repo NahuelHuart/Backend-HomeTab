@@ -12,22 +12,24 @@
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "*",
+        "symfony/asset": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2",
+        "symfony/form": "7.4.*",
         "symfony/framework-bundle": "7.4.*",
         "symfony/property-access": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/security-bundle": "7.4.*",
+        "symfony/twig-bridge": "7.4.*",
+        "symfony/twig-bundle": "7.4.*",
         "symfony/validator": "7.4.*",
         "symfony/webpack-encore-bundle": "^2.4",
         "symfony/yaml": "7.4.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "symfony/form": "*",
-        "symfony/maker-bundle": "*",
-        "symfony/twig-bundle": "*"
+        "symfony/maker-bundle": "*"
     },
     "config": {
         "allow-plugins": {
